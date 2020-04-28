@@ -1,0 +1,124 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TestWebSIte</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
+    <script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+    <link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/Trumbowyg/ui/trumbowyg.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        img {
+            width: 100%;
+            max-width: 900px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">TestWebSIte</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-0">
+                        @if (Context.Session.GetInt32("USER_LOGIN_KEY") == null) // 로그인 안했을때
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="IndexCus">상품목록</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">로그인</a>
+                            </li>
+                        }
+                        else if (Context.Session.GetInt32("USER_LOGIN_KEY") >= 2) // 고객으로 로그인
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="IndexCus">고객용 상품 목록</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Delivery">상품 주문</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ChkOrderList">주문 내역 확인</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ServiceCenter">고객센터</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Detail">내 정보</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>
+                            </li>
+                        }
+                        else // 관리자로 로그인
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Index">관리자용 상품 목록</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Add">상품추가</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="OrderList">미승인 주문내역</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ApprovalOrder">승인 주문내역</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="CustomerDelivery">고객 전달사항</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Statistics">통계</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2020 - HostCenter - <a asp-controller="Home" asp-action="Index">Home</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/Trumbowyg/trumbowyg.min.js"></script>
+    <script src="~/lib/Trumbowyg/plugins/upload/trumbowyg.upload.js"></script>
+    <script src="~/lib/Trumbowyg/langs/ko.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+    @section Scripts {
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+    }
+</body>
+</html>

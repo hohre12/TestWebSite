@@ -1,0 +1,28 @@
+﻿@model TestWebSIte.ViewModel.FindPwViewModel
+<h2>비밀번호 찾기</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Account" asp-action="FindPw" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="text" asp-for="UserId" class="form-control" placeholder="사용자 ID를 입력하세요." />
+            </div>
+            <div class="form-group">
+                <input type="email" asp-for="UserEmail" class="form-control" placeholder="사용자 이메일을 입력하세요." />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" value="FindPw" class="btn btn-primary">찾기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @if (ViewBag.pw != null)
+    {
+        <h2>찾으시는 비밀번호는 @ViewBag.pw 입니다.</h2>
+        <a class="btn btn-outline-secondary" asp-controller="Account" asp-action="Login">로그인하러 가기</a>
+    }
+</div>

@@ -1,0 +1,52 @@
+﻿@model TestWebSIte.ViewModel.ProductViewModel
+
+<h2>상품 주문</h2>
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <form asp-controller="Board" asp-action="Delivery" method="post">
+            <!--input type="hidden" asp-for="UserNo" /-->
+            <input type="hidden" asp-for="BoardNo" value="@ViewBag.boardNo"/>
+            <div class="form-group">
+                <label>제목</label>
+                <!-- 북마크 해놓은거 참고해서 뷰모델 만든다음 selectList 만들고 거기에 BoardTItle 담아서 선택가능하게하기,
+                그다음 동적 제이쿼리 사용해서 상품명 선택시 해당하는 상품 내용 나오게 하기. -->
+                <select onchange="this.form.submit()" asp-for="ProductChoice" asp-items="Model.Titles">
+                    <option selected="selected" disabled>상품명</option>
+                </select>
+
+                <!--input type="text" asp-for="BoardTitle" class="form-control" readonly="readonly" /-->
+
+            </div>
+            <div class="form-group">
+                <label>내용</label>
+                @if (ViewBag.content == null)
+                {
+                    <label asp-for="Contents" id="Contents">상품명을 선택해주세요~</label>
+                }
+                else
+                {
+                    <label asp-for="Contents" id="Contents" >@Html.Raw(ViewBag.content)</label>
+                }
+
+
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" asp-route-boardNo="@ViewBag.boardNo" asp-action="DOrder" formmethod="post" class="btn btn-primary">주문실행</button>
+                <a class="btn btn-warning" asp-controller="Board" asp-action="Index">취소</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-2"></div>
+</div>
+
+<!--script>
+    function itemChange() {
+        var titles = @Model.Titles;
+        if (@Model.Titles != Null) {
+            var content = titles.content
+        }
+    }
+</script-->

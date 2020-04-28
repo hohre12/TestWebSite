@@ -1,0 +1,34 @@
+﻿@model TestWebSIte.Models.Board
+
+@{
+    ViewData["Title"] = "상품 주문";
+}
+<h2>상품 주문</h2>
+
+<div class="row">
+    <div class="col-lg-2"></div>
+    <div class="col-lg-8">
+        <form asp-controller="Board" asp-action="Order" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <!--input type="hidden" asp-for="UserNo" /-->
+            <input type="hidden" asp-for="BoardNo" />
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" asp-for="BoardTitle" class="form-control" readonly="readonly" />
+                <span asp-validation-for="BoardTitle" class="text-danger"></span>
+                
+            </div>
+            <div class="form-group">
+                <label>내용</label>
+                <label class="border">@Html.Raw(Model.BoardContent)</label>
+                <!--div class="table-bordered"  asp-for>@Html.Raw(Model.BoardContent)</!--div-->
+            </div>
+
+            <div class="form-group">
+                <button type="submit" value="Order" class="btn btn-primary" asp-route-boardNo="BoardNo">주문실행</button>
+                <a class="btn btn-warning" asp-controller="Board" asp-action="Index">취소</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-lg-2"></div>
+</div>

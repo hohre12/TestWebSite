@@ -1,0 +1,57 @@
+﻿<h2>문의 답변하기</h2>
+<style>
+    input, textarea:focus {
+        outline: none;
+    }
+</style>
+<form asp-controller="Board" asp-action="Answer" method="post">
+    <div class="row">
+        <div class="col-xl-12 col-md-12">
+            <h2 class="text-center">상품 목록</h2>
+            <div class="table table-bordered">
+                <table width="100%" style="table-layout:fixed">
+                    <tr>
+                        <th class="table-active" width="10%">글번호</th>
+                        <td>@Model.InquireNo </td>
+                        <th class="table-active" width="10%">작성일</th>
+                        <td>@Model.QuestionDay</td>
+                    </tr>
+
+                    <tr>
+                        <th class="table-active" width="10%">작성자</th>
+                        <td>@Model.UserNo</td>
+                        <th class="table-active" width="10%">작성시간</th>
+                        <td>@Model.QuestionTime</td>
+                    </tr>
+
+                    <tr>
+                        <th class="table-active" width="10%">카테고리</th>
+                        <td colspan="3">@Model.CategoryChoice</td>
+                    </tr>
+
+                    <tr>
+                        <th class="table-active" width="10%">제목</th>
+                        <td colspan="3">@Model.Title</td>
+                    </tr>
+
+                    <tr>
+                        <th class="table-active" width="10%">문의 내용</th>
+                        <td colspan="3">@Html.Raw(Model.Questions)</td>
+                    </tr>
+
+                    <tr>
+                        <th class="table-active" width="10%">답변 하기</th>
+                        <td colspan="3"><textarea  class="form-control editor" rows="20" name="AnswerContent" placeholder="내용 입력"></textarea></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary" asp-route-InquireNo="@Model.InquireNo" onclick="return confirm('정말 답변을 저장하시겠습니까?')">저장</button>
+        <a class="btn btn-warning" asp-controller="Board" asp-action="AnswerList">뒤로가기</a>
+    </div>
+</form>
+
+
+

@@ -1,0 +1,46 @@
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Bootstrap4.NetCore;
+@using Microsoft.AspNetCore.Http
+@model X.PagedList.IPagedList<TestWebSIte.Models.Notice>
+
+@if (Context.Session.GetInt32("USER_LOGIN_KEY") == 1)
+{
+    <h2>관리자용 상품 목록</h2>
+}
+else
+{
+    <h2>공지사항</h2>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th width="10%">번호</th>
+            <th width="50%">제목</th>
+            <th width="10%">작성자</th>
+            <th width="10%">생성일</th>
+            <th width="10%">조회수</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var notice in Model)
+        {
+            <tr>
+                <td width="10%">@notice.NoticeNo</td>
+                <td width="50%"><a asp-controller="Board" asp-action="NoticeDetail" asp-route-noticeNo="@notice.NoticeNo">@notice.NoticeTitle</a></td>
+                <td width="10%">@notice.UserNo</td>
+                <td width="10%">@notice.Regdate</td>
+                <td width="10%">@notice.ViewCnt</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@*아따 힘들었따 ㄹㅇ - 페이징 처리 by BootStrap -> X.PagedList.Mvc.Core가 얼마전 업데이트되서 8.0.5로 받아버려서 적용이 안됫엇음ㅡㅡ*@
+<div class="pagination">
+    @Html.PagedListPager(Model, Page => Url.Action("NoticeList", new { Page }), Bootstrap4PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">돌아가기</a>
+</div>

@@ -1,0 +1,17 @@
+﻿@model TestWebSIte.ViewModel.ChkPwViewModel
+<div class="text-center">
+    <h1 class="display-4">비밀번호 확인</h1>
+    <form asp-controller="Account" asp-action="ChkPw" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <!-- <input type="hidden" asp-for="UserPw" /> -->
+        <div class="form-group">
+            <label asp-for="UserPw" class="control-label">비밀번호를 입력하세요.</label>
+            <input type="password" asp-for="UserPw" class="form-control" />
+            <span asp-validation-for="UserPw" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="확인" class="btn btn-primary" />
+        </div>
+    </form>
+</div>

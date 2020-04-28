@@ -1,0 +1,37 @@
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Bootstrap4.NetCore;
+@using Microsoft.AspNetCore.Http
+@model TestWebSIte.ViewModel.FaqViewModel
+
+<h2>FAQ</h2>
+<form asp-controller="Board" asp-action="FaqList" method="get">
+    <div class="text-center">
+        <select onchange="this.form.submit();" asp-for="CategoryChoice" asp-items="Model.Categories">
+            <option selected="selected" disabled>카테고리</option>
+        </select>
+    </div>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th width="10%">번호</th>
+                <th width="80%">제목</th>
+                <th width="10%">작성일</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var faq in Model.Questions)
+            {
+                <tr>
+                    <td width="10%">@Html.DisplayFor(modelItem => faq.FaqNo)</td>
+                    <td width="80%"><a asp-controller="Board" asp-action="FaqDetail" asp-route-faqNo="@faq.FaqNo">@Html.DisplayFor(modelItem => faq.FaqTItle)</a></td>
+                    <td width="10%">@Html.DisplayFor(modelItem => faq.Regdate)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">돌아가기</a>
+</div>

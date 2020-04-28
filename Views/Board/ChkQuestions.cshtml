@@ -1,0 +1,42 @@
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Bootstrap4.NetCore;
+@using Microsoft.AspNetCore.Http
+@model X.PagedList.IPagedList<TestWebSIte.Models.Answer>
+
+
+<h2>1:1 문의 내역</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th width="10%">답변 번호</th>
+            <th width="10%">문의 번호</th>
+            <th width="40%">제목</th>
+            <th width="20%">카테고리</th>
+            <th width="10%">문의날짜</th>
+            <th width="10%">답변날짜</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var answer in Model)
+        {
+            <tr>
+                <td width="10%">@answer.AnswerNo</td>
+                <td width="10%">@answer.InquireNo</td>
+                <td width="40%"><a asp-controller="Board" asp-action="QuestionDetail" asp-route-answerNo="@answer.AnswerNo">@answer.Title</a></td>
+                <td width="20%">@answer.CategoryChoice</td>
+                <td width="10%">@answer.QuestionDay</td>
+                <td width="10%">@answer.AnswerDay</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@*아따 힘들었따 ㄹㅇ - 페이징 처리 by BootStrap -> X.PagedList.Mvc.Core가 얼마전 업데이트되서 8.0.5로 받아버려서 적용이 안됫엇음ㅡㅡ*@
+<div class="pagination">
+    @Html.PagedListPager(Model, Page => Url.Action("ChkQuestions", new { Page }), Bootstrap4PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">홈으로 가기</a>
+</div>

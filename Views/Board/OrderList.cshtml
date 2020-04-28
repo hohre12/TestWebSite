@@ -1,0 +1,40 @@
+﻿@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Bootstrap4.NetCore;
+@using Microsoft.AspNetCore.Http
+@model X.PagedList.IPagedList<TestWebSIte.Models.Order>
+
+<h2>미승인 주문 내역</h2>
+<form asp-controller="Board" asp-action="OrderList" method="post">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th width="10%">주문 번호</th>
+                <th width="10%">상품 번호</th>
+                <th width="10%">주문자</th>
+                <th width="60%">상품 제목</th>
+                <th width="10%">승인여부</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model)
+            {
+                <tr>
+                    <td width="10%">@order.OrderNo</td>
+                    <td width="10%">@order.BoardNo</td>
+                    <td width="10%">@order.UserNo</td>
+                    <td width="60%"><a asp-controller="Board" asp-action="OrderDetail" asp-route-orderNo="@order.OrderNo">@order.BoardTitle</a></td>
+                    <td width="10%">
+                        <button type="submit" class="btn btn-primary" asp-route-orderNo="@order.OrderNo" onclick="return confirm('정말 승인하시겠습니까?')">승인</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+<div class="pagination">
+    @Html.PagedListPager(Model, Page => Url.Action("OrderList", new { Page }), Bootstrap4PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">돌아가기</a>
+</div>

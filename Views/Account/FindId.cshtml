@@ -1,0 +1,27 @@
+﻿@model TestWebSIte.ViewModel.FindIdViewModel
+<h2>아이디 찾기</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="Account" asp-action="FindId" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input type="email" asp-for="UserEmail" class="form-control" placeholder="사용자 이메일을 입력하세요." />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" value="FindId" class="btn btn-primary">찾기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    @if (ViewBag.id != null)
+    {
+        <h2>찾으시는 아이디는 @ViewBag.Id 입니다.</h2>
+        <a class="btn btn-outline-secondary" asp-controller="Account" asp-action="FindPw">비밀번호 찾기</a>
+    }
+    
+</div>
+
