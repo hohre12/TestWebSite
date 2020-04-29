@@ -20,6 +20,7 @@ namespace TestWebSIte.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(@"Server=localhost;Database=BoardDbContext-2;User Id=sa;Password=sa1234;");
+            optionsBuilder.UseSqlServer(@"Server=192.168.100.151;Database=BoardDbContext-2;User Id=nmasteruser;Password=rhrortpsxj;");
         }
     }
 }
