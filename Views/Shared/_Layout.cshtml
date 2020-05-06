@@ -47,29 +47,7 @@
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">로그인</a>
                             </li>
                         }
-                        else if (Context.Session.GetInt32("USER_LOGIN_KEY") >= 2) // 고객으로 로그인
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Board" asp-action="IndexCus">고객용 상품 목록</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Delivery">상품 주문</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ChkOrderList">주문 내역 확인</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ServiceCenter">고객센터</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Detail">내 정보</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>
-                            </li>
-                        }
-                        else // 관리자로 로그인
+                        else if (Context.Session.GetInt32("USER_LOGIN_KEY") == 1) // 관리자로 로그인
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Board" asp-action="Index">관리자용 상품 목록</a>
@@ -88,6 +66,28 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Board" asp-action="Statistics">통계</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>
+                            </li>
+                        }
+                        else // 고객으로 로그인
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="IndexCus">고객용 상품 목록</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="Delivery">상품 주문</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ChkOrder">주문 내역 확인</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ServiceCenter">고객센터</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Account" asp-action="Detail">내 정보</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>

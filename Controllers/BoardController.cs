@@ -184,7 +184,7 @@ namespace TestWebSIte.Controllers
 
         // 사용자 : 주문하기 기능 실행
         [HttpPost]
-        public IActionResult Order(Order model , int boardNo)
+        public IActionResult Order(Order model, int boardNo)
         {
             var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
             model.OrderDay = DateTime.Now.ToString("MM'/'dd'/'yyyy");
@@ -269,6 +269,11 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 사용자 - 상품주문 SELECT로 바로하기 view
+        /// </summary>
+        /// <param name="productChoice"></param>
+        /// <returns></returns>
         public async Task<IActionResult> Delivery(string productChoice)
         {
             using (var db = new BoardDbContext())
@@ -300,6 +305,12 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 사용자 - 바로 상품주문에서 SELECT 하면 폼 전송
+        /// </summary>
+        /// <param name="productChoice"></param>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Delivery(string productChoice, ProductViewModel model)
         {
@@ -351,6 +362,13 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 사용자 - 상품주문 SELECT로 바로하기 기능 실행
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="boardNo"></param>
+        /// <param name="productChoice"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult DOrder(Order model, int boardNo, string productChoice)
         {
@@ -378,20 +396,6 @@ namespace TestWebSIte.Controllers
             return View(model);
         }
 
-        // 관리자 : ??
-        //[HttpPost]
-        //public IActionResult ApprovalOrder(int orderNo)
-        //{
-        //
-        //    using (var db = new BoardDbContext())
-        //    {
-        //        var order = db.Orders.FirstOrDefault(b => b.OrderNo.Equals(orderNo));
-        //        db.Orders.Remove(order);
-        //        db.SaveChanges();
-        //    }
-        //    return Redirect("Index");
-        //}
-
         // 사용자 본인 : 주문 내역 확인
         public IActionResult ChkOrderList(int? Page)
         {
@@ -417,11 +421,20 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 관리자 : 고객전달사항 view
+        /// </summary>
+        /// <returns></returns>
         public IActionResult CustomerDelivery()
         {
             return View();
         }
 
+        /// <summary>
+        /// 사용자 - 공지사항 view
+        /// </summary>
+        /// <param name="Page"></param>
+        /// <returns></returns>
         public IActionResult NoticeList(int? Page)
         {
             using (var db = new BoardDbContext())
@@ -434,6 +447,10 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 관리자 - 공지사항 등록 view
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Notice()
         {
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
@@ -443,6 +460,11 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 관리자 - 공지사항 등록 기능 실행
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Notice(Notice model)
         {
@@ -468,11 +490,20 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 사용자 - 고객센터 view
+        /// </summary>
+        /// <returns></returns>
         public IActionResult ServiceCenter()
         {
             return View();
         }
 
+        /// <summary>
+        /// 사용자 - 공지사항 디테일 view
+        /// </summary>
+        /// <param name="noticeNo"></param>
+        /// <returns></returns>
         public IActionResult NoticeDetail(int noticeNo)
         {
 
@@ -483,6 +514,10 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        /// <summary>
+        /// 관리자 - FAQ 등록
+        /// </summary>
+        /// <returns></returns>
         public IActionResult FaqAdd()
         {
             return View();
@@ -631,7 +666,7 @@ namespace TestWebSIte.Controllers
 
         // 일별 주문
         [HttpPost]
-        public async Task<IActionResult> StatisticsOrderDaily(int? Page , int zz)
+        public async Task<IActionResult> StatisticsOrderDaily(int? Page, int zz)
         {
             var OrderDay = Request.Form["OrderDay"].ToString();
 
@@ -647,7 +682,7 @@ namespace TestWebSIte.Controllers
                 if (!string.IsNullOrEmpty(OrderDay))
                 {
                     order = order.Where(p => p.OrderDay == OrderDay);
-                    
+
                 }
                 ViewBag.count = order.Count();
                 var list = await order.ToListAsync();
@@ -735,7 +770,7 @@ namespace TestWebSIte.Controllers
 
         // 일별 회원가입
         [HttpPost]
-        public async Task<IActionResult> StatisticsSignUpDaily(int? Page , int zz)
+        public async Task<IActionResult> StatisticsSignUpDaily(int? Page, int zz)
         {
             var SignUpDay = Request.Form["SignUpDay"].ToString();
 
@@ -746,7 +781,7 @@ namespace TestWebSIte.Controllers
                                             select p.UserNo;
 
                 var user = from f in db.Users
-                            select f;
+                           select f;
 
                 if (!string.IsNullOrEmpty(SignUpDay))
                 {
@@ -773,7 +808,7 @@ namespace TestWebSIte.Controllers
                                             select p.UserNo;
 
                 var user = from f in db.Users
-                            select f;
+                           select f;
 
                 if (!string.IsNullOrEmpty(SignUpYear) && !string.IsNullOrEmpty(SignUpMonth))
                 {
@@ -792,7 +827,7 @@ namespace TestWebSIte.Controllers
 
         // 월별 회원가입
         [HttpPost]
-        public async Task<IActionResult> StatisticsSignUpMonthly(int? Page , int zz)
+        public async Task<IActionResult> StatisticsSignUpMonthly(int? Page, int zz)
         {
             var SignUpYear = Request.Form["SignUpYear"].ToString();
             var SignUpMonth = Request.Form["SignUpMonth"].ToString();
@@ -804,7 +839,7 @@ namespace TestWebSIte.Controllers
                                             select p.UserNo;
 
                 var user = from f in db.Users
-                            select f;
+                           select f;
 
                 if (!string.IsNullOrEmpty(SignUpYear) && !string.IsNullOrEmpty(SignUpMonth))
                 {
@@ -855,7 +890,7 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
-        public async Task<IActionResult> AnswerList(int? Page , int zz)
+        public async Task<IActionResult> AnswerList(int? Page, int zz)
         {
             using (var db = new BoardDbContext())
             {
@@ -865,7 +900,7 @@ namespace TestWebSIte.Controllers
                 IQueryable<string> categoryQuery = from p in db.Inquires
                                                    orderby p.CategoryChoice
                                                    select p.CategoryChoice;
-                
+
 
                 var inquires = from f in db.Inquires
                                select f;
@@ -889,7 +924,7 @@ namespace TestWebSIte.Controllers
         {
             var QuestionDay = Request.Form["QuestionDay"].ToString();
             var ChoiceCategory = Request.Form["ChoiceCategory"].ToString();
-            if(ChoiceCategory == "카테고리")
+            if (ChoiceCategory == "카테고리")
             {
                 ChoiceCategory = "";
             }
@@ -903,7 +938,7 @@ namespace TestWebSIte.Controllers
                                                    select p.CategoryChoice;
 
                 var inquires = from f in db.Inquires
-                           select f;
+                               select f;
 
                 var Categories = new SelectList(await categoryQuery.Distinct().ToListAsync());
                 ViewBag.Categories = Categories;
@@ -914,10 +949,10 @@ namespace TestWebSIte.Controllers
                     ViewBag.count = inquires.Count();
                     ViewBag.day = QuestionDay;
                 }
-                if(!string.IsNullOrEmpty(ChoiceCategory))
+                if (!string.IsNullOrEmpty(ChoiceCategory))
                 {
                     inquires = inquires.Where(p => p.CategoryChoice == ChoiceCategory);
-                    
+
                     ViewBag.day = QuestionDay;
                 }
                 ViewBag.count = inquires.Count();
@@ -962,7 +997,7 @@ namespace TestWebSIte.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Answer(int InquireNo , Answer model)
+        public async Task<IActionResult> Answer(int InquireNo, Answer model)
         {
             //var InquireNo = Request.Form["InquireNo"].ToString();
             var AnswerContent = Request.Form["AnswerContent"].ToString();
@@ -1006,7 +1041,7 @@ namespace TestWebSIte.Controllers
 
 
                 var answers = from f in db.Answers
-                               select f;
+                              select f;
 
                 var Categories = new SelectList(await categoryQuery.Distinct().ToListAsync());
                 ViewBag.Categories = Categories;
@@ -1043,7 +1078,7 @@ namespace TestWebSIte.Controllers
                                                    select p.CategoryChoice;
 
                 var answers = from f in db.Answers
-                               select f;
+                              select f;
 
                 var Categories = new SelectList(await categoryQuery.Distinct().ToListAsync());
                 ViewBag.Categories = Categories;
@@ -1083,13 +1118,13 @@ namespace TestWebSIte.Controllers
             using (var db = new BoardDbContext())
             {
                 var answers = from a in db.Answers
-                             where a.UserNo == userNo
-                             select a;
+                              where a.UserNo == userNo
+                              select a;
 
                 var list = await answers.ToListAsync();
                 var PageNo = Page ?? 1;
                 var PageSize = 5;
-                
+
                 return View(list.ToPagedList(PageNo, PageSize));
             }
         }
@@ -1105,7 +1140,7 @@ namespace TestWebSIte.Controllers
         }
 
         ////////////////////// -- 2020 - 04 - 27 추가 사항
-        
+
         // 관리자 - 미승인 주문 상세 view
         public IActionResult OrderDetail(int orderNo)
         {
@@ -1123,6 +1158,36 @@ namespace TestWebSIte.Controllers
             {
                 var approvedOrder = db.ApprovedOrders.FirstOrDefault(o => o.ApprovalNo.Equals(approvalNo));
                 return View(approvedOrder);
+            }
+        }
+
+        ///////////////////////// -- 2020 - 05 - 06 추가 사항
+        public IActionResult ChkOrder()
+        {
+            return View();
+        }
+
+        public IActionResult NoChkOrderList(int? Page)
+        {
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
+            using (var db = new BoardDbContext())
+            {
+                // var user = db.Users.FirstOrDefault(u => u.UserNo.Equals(userNo));
+                var order = db.Orders.ToList();
+                //List<ApprovedOrder> apo = new List<ApprovedOrder>();
+                var order2 = from _app in order
+                             where _app.UserNo == userNo
+                             select _app;
+
+                var PageNo = Page ?? 1;
+                var PageSize = 5;
+                // var list = 
+                return View(order2.ToPagedList(PageNo, PageSize));
             }
         }
     }

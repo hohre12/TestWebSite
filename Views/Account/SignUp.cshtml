@@ -12,32 +12,32 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label>사용자 ID</label>
-                <input type="text" asp-for="UserId" class="form-control" placeholder="사용자 ID 입력" />
-                <!--span asp-validation-for="UserId" class="text-danger"></span-->
-                <button asp-controller="Account" asp-action="SignUp" formmethod="get" asp-route-userId="UserId" class="btn btn-secondary navbar-nav ml-auto text-center" >ID 중복체크</button>
+                <input type="text" asp-for="UserId" id="user_id" class="form-control" placeholder="사용자 ID 입력" />
+                <div class="text-danger" id="id_check"></div>
+                <span asp-validation-for="UserId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label>사용자 비밀번호</label>
                 <input type="password" asp-for="UserPw" class="form-control" placeholder="사용자 비밀번호 입력" />
-                <!--span asp-validation-for="UserPw" class="text-danger"></span-->
+                <span asp-validation-for="UserPw" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label>사용자 이름</label>
                 <input type="text" asp-for="UserName" class="form-control" placeholder="사용자 이름 입력" />
-                <!--span asp-validation-for="UserName" class="text-danger"></span-->
+                <span asp-validation-for="UserName" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label>사용자 E-Mail</label>
                 <input type="text" asp-for="UserEmail" class="form-control" placeholder="사용자 소개 입력" />
-                <!--span-- asp-validation-for="UserEmail" class="text-danger"></span-->
+                <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label>사용자 소개</label>
-                <input type="text" asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" />
-                <!--textarea asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" rows="20"></textarea-->
-                <!--span asp-validation-for="UserIntro" class="text-danger"></span-->
+                <!--input type="text" asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" /-->
+                <textarea asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" rows="10"></textarea>
+                <span asp-validation-for="UserIntro" class="text-danger"></span>
             </div>
 
             <div class="form-group">
@@ -46,7 +46,7 @@
             </div>
 
             <div class="form-group">
-                <button type="submit" value="SignUp" class="btn btn-primary" asp-route-userId="UserId">회원가입</button>
+                <button type="submit" value="SignUp" id="reg_submit" class="btn btn-primary">회원가입</button>
                 <a class="btn btn-warning" href="../Home/Index">취소</a>
             </div>
         </form>
@@ -56,6 +56,34 @@
 <div>
     <a asp-controller="Home" asp-action="Index">Back to List</a>
 </div>
+<script type="text/javascript">
+    $("#user_id").blur(function () {
+        var user_id = $('#user_id').val();
+        $.ajax({
+            type: "get",
+            url: '/Account/IdChkForm?UserId=' + user_id,
+            success: function (data) {
+                console.log("1 = 중복o / 0 = 중복x : " + data);
+
+                if (data == 2) {
+                    $("#id_check").text("아이디를 입력하세요");
+                    $("#id_check").css("color", "red");
+                    $("#reg_submit").attr("disabled", false);
+                }
+                else if (data == 1) {
+                    $("#id_check").text("사용중인 아이디입니다.");
+                    $("#id_check").css("color", "red");
+                    $("#reg_submit").attr("disabled", true);
+                }
+                else {
+                    $("#id_check").text("가입 가능한 아이디입니다.");
+                    $("#id_check").css("color", "red");
+                    $("#reg_submit").attr("disabled", false);
+                }
+            }
+        });
+    })
+</script>
 
 @section Scripts {
     <script src='https://www.google.com/recaptcha/api.js'></script>

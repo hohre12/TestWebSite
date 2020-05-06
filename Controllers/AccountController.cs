@@ -24,7 +24,7 @@ namespace TestWebSIte.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly IConfiguration _configuration;
 
-        public AccountController(IConfiguration configuration , ILogger<AccountController> logger)
+        public AccountController(IConfiguration configuration, ILogger<AccountController> logger)
         {
             _configuration = configuration;
             _logger = logger;
@@ -34,7 +34,7 @@ namespace TestWebSIte.Controllers
 
         // 관리자or사용자or아무나 : 로그인 View 보기
         // GET: /<controller>/
-        public IActionResult Login() 
+        public IActionResult Login()
         {
             // 로그인 되어있을때 로그인화면으로 가게된다면 세션 리무브(로그아웃) 시키고 로그인 화면 보여주기
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") != null)
@@ -50,15 +50,15 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 using (var db = new BoardDbContext())
                 {
                     var user = db.Users.FirstOrDefault(u => u.UserId.Equals(model.UserId) && u.UserPw.Equals(model.UserPw));
 
-                    if(user != null)
+                    if (user != null)
                     {
-                        HttpContext.Session.SetInt32("USER_LOGIN_KEY" , user.UserNo);
+                        HttpContext.Session.SetInt32("USER_LOGIN_KEY", user.UserNo);
                         return RedirectToAction("LoginSuccess", "Home");
                     }
                 }
@@ -71,7 +71,7 @@ namespace TestWebSIte.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Remove("USER_LOGIN_KEY");
-            return RedirectToAction("Index" , "Home");
+            return RedirectToAction("Index", "Home");
         }
 
         // 관리자or사용자or아무나 : 아이디 or 비밀번호 찾기 View
@@ -103,7 +103,7 @@ namespace TestWebSIte.Controllers
                         return View();
                     }
                 }
-                ModelState.AddModelError(string.Empty , "입력하신 Email에 일치하는 ID가 없습니다.");
+                ModelState.AddModelError(string.Empty, "입력하신 Email에 일치하는 ID가 없습니다.");
             }
             return View(model);
         }
@@ -159,9 +159,9 @@ namespace TestWebSIte.Controllers
                     return View(user);
                 }
             }
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
-        
+
         // 사용자 본인 or 관리자 : 정보 수정 기능 실행
         [HttpPost]
         public IActionResult ChangeInfo(User user)
@@ -176,17 +176,17 @@ namespace TestWebSIte.Controllers
                 return NotFound();
             }
 
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-               
-               using (var db = new BoardDbContext())
-               {
-                   db.Update(user);
-                   db.SaveChanges();
-               }
+
+                using (var db = new BoardDbContext())
+                {
+                    db.Update(user);
+                    db.SaveChanges();
+                }
                 return RedirectToAction("ChangeMyInforSuccess", "Home");
             }
-            return View(user); 
+            return View(user);
         }
 
         // 사용자 본인 or 관리자 : 정보수정시 비밀번호 체크 View
@@ -212,7 +212,7 @@ namespace TestWebSIte.Controllers
             {
                 return NotFound();
             }
-            
+
             if (ModelState.IsValid)
             {
                 using (var db = new BoardDbContext())
@@ -221,7 +221,7 @@ namespace TestWebSIte.Controllers
                     var pw = user.UserPw;
                     if (pw.Equals(model.UserPw))
                     {
-                        return RedirectToAction("ChangeInfo" , "Account");
+                        return RedirectToAction("ChangeInfo", "Account");
                     }
                 }
                 ModelState.AddModelError(string.Empty, "비밀번호를 잘못 입력하셨습니다.");
@@ -229,39 +229,24 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
-        // 아무나 : 회원가입 VIew -------------- 중복확인 구현중
+        // 아무나 : 회원가입 VIew
         [AllowAnonymous]
-        public IActionResult SignUp(User model,string userId)
+        public IActionResult SignUp()
         {
             ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
-            if (userId == null)
-            {
-                return View();
-            }
-            
-            using (var db = new BoardDbContext())
-            {
-                var user = db.Users.FirstOrDefault(u => u.UserId.Equals(userId));
-                if (user == null)
-                {
-                    ModelState.AddModelError(string.Empty, "아이디를 사용하실수 있습니다.");
-                    //Response.WriteAsync("(javascript:alert('사용하시겠습니까?');");
-                    return View(model);
-                }
-                ModelState.AddModelError(string.Empty, "이미 존재하는 ID 입니다.");
-                return View(model);
-            }
+            return View();
         }
 
         // 아무나 : 회원가입 기능 실행
         [HttpPost]
-        public IActionResult SignUp(User model , string userId,int zz)
+        public IActionResult SignUp(User model)
         {
             ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
 
             model.SignUpYear = DateTime.Now.ToString("yyyy");
             model.SignUpMonth = DateTime.Now.ToString("MM");
             model.SignUpDay = DateTime.Now.ToString("MM'/'dd'/'yyyy");
+
             if (ModelState.IsValid)
             {
                 if (!ReCaptchaPassed(
@@ -275,36 +260,36 @@ namespace TestWebSIte.Controllers
                 }
                 using (var db = new BoardDbContext())
                 {
-                    var user = db.Users.FirstOrDefault(u => u.UserId.Equals(userId));
-                    if(user != null)
-                    {
-                        ModelState.AddModelError(string.Empty, "ID가 이미 존재합니다.");
-                        return View(model);
-                    }
                     db.Users.Add(model);
                     db.SaveChanges();
                 }
-                return RedirectToAction("Index" , "Home");
+                return RedirectToAction("Index", "Home");
             }
 
             return View(model);
         }
 
-        // 아이디 중복체크 - 구현중
-        //public IActionResult IdChk(User model , string userId)
-        //{
-        //    using (var db = new BoardDbContext())
-        //    {
-        //        var user = db.Users.FirstOrDefault(u => u.UserId.Equals(userId));
-        //        if (user == null)
-        //        {
-        //            ModelState.AddModelError(string.Empty, "아이디를 사용하실수 있습니다.");
-        //            return View(model);
-        //        }
-        //        ModelState.AddModelError(string.Empty, "이미 존재하는 ID 입니다.");
-        //        return View(model);
-        //    }
-        //}
+        // @@@ 아이디 중복체크 - 구현중 @@@
+        public int IdChkForm()
+        {
+            var userId = Request.Query["UserId"];
+            using (var db = new BoardDbContext())
+            {
+                var user = db.Users.ToList();
+                var user_id = from u in user
+                              select u;
+                user_id = user_id.Where(u => u.UserId == userId);
+                if (userId.Equals(""))
+                {
+                    return 2;
+                }
+                else if (user_id.Count() != 0)
+                {
+                    return 1;
+                }
+            }
+            return 0;
+        }
 
 
         /// <summary>
@@ -320,7 +305,7 @@ namespace TestWebSIte.Controllers
             }
 
             var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
-            
+
             using (var db = new BoardDbContext())
             {
                 var user = db.Users.FirstOrDefault(u => u.UserNo.Equals(userNo));

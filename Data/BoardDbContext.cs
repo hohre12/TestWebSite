@@ -19,7 +19,10 @@ namespace TestWebSIte.Data
         public DbSet<Answer> Answers { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // 151 db서버
             optionsBuilder.UseSqlServer(@"Server=192.168.100.151;Database=BoardDbContext-2;User Id=nmasteruser;Password=rhrortpsxj;");
+            // 로컬
+            // optionsBuilder.UseSqlServer(@"Server=localhost;Database=BoardDbContext-2;User Id=sa;Password=sa1234;");
         }
     }
 }
