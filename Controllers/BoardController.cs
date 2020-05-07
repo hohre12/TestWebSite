@@ -707,7 +707,11 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // 월별 주문
+        /// <summary>
+        /// 관리자 - 월별 주문 view
+        /// </summary>
+        /// <param name="Page"></param>
+        /// <returns></returns>
         public async Task<IActionResult> StatisticsOrderMonthly(int? Page)
         {
             //var OrderYear = Request.Form["OrderYear"].ToString();
