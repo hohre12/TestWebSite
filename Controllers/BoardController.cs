@@ -523,6 +523,11 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
+        /// <summary>
+        ///  관리자 - FAQ 등록 기능 실행
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult FaqAdd(Faq model)
         {
@@ -548,6 +553,11 @@ namespace TestWebSIte.Controllers
             return View();
         }
 
+        /// <summary>
+        /// 사용자 - FAQ 리스트 view (수정 필요)
+        /// </summary>
+        /// <param name="CategoryChoice"></param>
+        /// <returns></returns>
         public async Task<IActionResult> FaqList(string CategoryChoice)
         {
             using (var db = new BoardDbContext())
