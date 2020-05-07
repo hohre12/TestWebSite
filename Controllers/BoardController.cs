@@ -515,7 +515,7 @@ namespace TestWebSIte.Controllers
         }
 
         /// <summary>
-        /// 관리자 - FAQ 등록
+        /// 관리자 - FAQ 등록 view
         /// </summary>
         /// <returns></returns>
         public IActionResult FaqAdd()
