@@ -810,7 +810,11 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // 월별 회원가입
+        /// <summary>
+        /// 관리자 - 월별 회원가입 수 view
+        /// </summary>
+        /// <param name="Page"></param>
+        /// <returns></returns>
         public async Task<IActionResult> StatisticsSignUpMonthly(int? Page)
         {
             var SignUpYear = Request.Query["SignUpYear"].ToString();
