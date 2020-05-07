@@ -674,7 +674,12 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // 일별 주문
+        /// <summary>
+        /// 관리자 - 일별 주문 검색 기능 실행
+        /// </summary>
+        /// <param name="Page"></param>
+        /// <param name="zz"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> StatisticsOrderDaily(int? Page, int zz)
         {
