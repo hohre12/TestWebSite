@@ -1217,14 +1217,6 @@ namespace TestWebSIte.Controllers
         // TEST 7할게 제발 에러좀 나지말자
         // TEST 8이다!!!
         
-        /////////////////////////////////////////////// -- 2020 - 05 - 13 추가 사항
-        /// <summary>
-        /// 관리자 - 회원정보보기
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult ViewMember()
-        {
-            return View();
-        }
+        
     }
 }
