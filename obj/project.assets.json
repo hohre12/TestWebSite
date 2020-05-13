@@ -8360,11 +8360,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\JaeWon\\source\\repos\\TestWebSIte\\TestWebSIte.csproj",
+      "projectUniqueName": "C:\\Github\\Master\\TestWebSIte.csproj",
       "projectName": "TestWebSIte",
-      "projectPath": "C:\\Users\\JaeWon\\source\\repos\\TestWebSIte\\TestWebSIte.csproj",
+      "projectPath": "C:\\Github\\Master\\TestWebSIte.csproj",
       "packagesPath": "C:\\Users\\JaeWon\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\JaeWon\\source\\repos\\TestWebSIte\\obj\\",
+      "outputPath": "C:\\Github\\Master\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\JaeWon\\AppData\\Roaming\\NuGet\\NuGet.Config",
