@@ -250,4 +250,5 @@ C:\Github\Master\obj\Debug\netcoreapp3.1\TestWebSIte.Views.pdb
 C:\Github\Master\obj\Debug\netcoreapp3.1\TestWebSIte.csproj.CopyComplete
 C:\Github\Master\obj\Debug\netcoreapp3.1\TestWebSIte.dll
 C:\Github\Master\obj\Debug\netcoreapp3.1\TestWebSIte.pdb
-C:\Github\Master\obj\Debug\netcoreapp3.1\Razor\Views\Account\ViewMember.cshtml.g.cs
+C:\Github\Master\obj\Debug\netcoreapp3.1\Razor\Views\Board\ViewMember.cshtml.g.cs
+C:\Github\Master\obj\Debug\netcoreapp3.1\Razor\Views\Board\UserDetail.cshtml.g.cs

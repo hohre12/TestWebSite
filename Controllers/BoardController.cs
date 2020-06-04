@@ -1214,9 +1214,67 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // TEST 7할게 제발 에러좀 나지말자
-        // TEST 8이다!!!
-        
-        
+        ///////////////////////// -- 2020 - 06 - 01 추가 사항
+        ////// <summary>
+        /// 관리자 - 회원정보보기
+        /// </summary>
+        /// <returns></returns>
+        public IActionResult ViewMember(int? Page)
+        {
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            else if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") != 1)
+            {
+                //Response.WriteAsync("<script type='text/javascript'>alert('관리자만 사용가능합니다.')");
+                return RedirectToAction("Index", "Home");
+            }
+            using (var db = new BoardDbContext())
+            {
+                var list = db.Users.ToList();
+                var PageNo = Page ?? 1;
+                var PageSize = 5;
+
+                return View(list.ToPagedList(PageNo, PageSize));
+            }
+        }
+
+        /// <summary>
+        /// 관리자 : 회원 정보 상세보기 VIew
+        /// </summary>
+        /// <param name="userNo"></param>
+        /// <returns></returns>
+        public IActionResult UserDetail(int userNo)
+        {
+            using (var db = new BoardDbContext())
+            {
+                var user = db.Users.FirstOrDefault(b => b.UserNo.Equals(userNo));
+                return View(user);
+            }
+        }
+
+        /// <summary>
+        /// 회원 삭제 - 관리자가 쓰는 Delete ( 데이터에서 완전 삭제되는것 ) ... 본인도 써야할듯..UserDetail에서 Data에 있는거 다가져옴
+        /// </summary>
+        /// <param name="userNo"></param>
+        /// <returns></returns>
+        public IActionResult UserDelete(int userNo)
+        {
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            using (var db = new BoardDbContext())
+            {
+                var user = db.Users.FirstOrDefault(b => b.UserNo.Equals(userNo));
+                db.Users.Remove(user);
+                db.SaveChanges();
+            }
+            return Redirect("Index");
+        }
+
+
     }
 }

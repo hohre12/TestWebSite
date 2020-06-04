@@ -269,7 +269,7 @@ namespace TestWebSIte.Controllers
             return View(model);
         }
 
-        // @@@ 아이디 중복체크 - 구현중 @@@
+        // @@@ 아이디 중복체크 - 구현완료 - ajax로 구현함! @@@
         public int IdChkForm()
         {
             var userId = Request.Query["UserId"];
@@ -313,19 +313,7 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        /////////////////////////////////////////////// -- 2020 - 05 - 13 추가 사항
-        /// <summary>
-        /// 관리자 - 회원정보보기
-        /// </summary>
-        /// <returns></returns>
-        public IActionResult ViewMember()
-        {
-            return View();
-        }
-        //test1111111
-
-        ///////////////////////////
-
+        ////////////////////////////////////////// -- ReCaptcha API
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret, ILogger logger)
         {
             HttpClient httpClient = new HttpClient();
