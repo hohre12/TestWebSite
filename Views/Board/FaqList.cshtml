@@ -6,7 +6,7 @@
 <h2>FAQ</h2>
 <form asp-controller="Board" asp-action="FaqList" method="get">
     <div class="text-center">
-        <select onchange="this.form.submit();" asp-for="CategoryChoice" asp-items="Model.Categories">
+        <select class="custom-select-sm" onchange="this.form.submit();" asp-for="CategoryChoice" asp-items="Model.Categories">
             <option selected="selected" disabled>카테고리</option>
         </select>
     </div>

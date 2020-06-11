@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -50,20 +53,38 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            var pw = Request.Form["UserPw"].ToString(); // 사용자가 입력한 비밀번호
+            var db2 = new BoardDbContext(); // db 연결
+            var IdUser = db2.Users.FirstOrDefault(u => u.UserId.Equals(model.UserId)); // 사용자가 입력한 ID랑 일치하는 ID를 DB에서 유저 객체로 가져와서
+            if (IdUser != null) // 일치하는 유저가 존재할때
             {
-                using (var db = new BoardDbContext())
-                {
-                    var user = db.Users.FirstOrDefault(u => u.UserId.Equals(model.UserId) && u.UserPw.Equals(model.UserPw));
+                // 해쉬 생성
+                string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: pw, // 사용자가 입력한 비밀번호
+                salt: IdUser.UserSalt, // DB에서 가져온 유저의 Salt값
+                prf: KeyDerivationPrf.HMACSHA1, // 해쉬 : SHA1
+                iterationCount: 10000, // 10000번 반복
+                numBytesRequested: 256 / 8 // 길이 32
+                ));
 
-                    if (user != null)
+                model.UserPw = hashed; // 사용자가 입력한 비밀번호 해시 값
+
+                if (ModelState.IsValid) // DB에 Null 포함 값이 다 존재 한다면
+                {
+                    using (var db = new BoardDbContext())
                     {
-                        HttpContext.Session.SetInt32("USER_LOGIN_KEY", user.UserNo);
-                        return RedirectToAction("LoginSuccess", "Home");
+                        // 사용자가 입력한 ID && 사용자가 입력한 비밀번호 해시값과 DB에 담긴 ID와 해시값이 각각 같은 유저 객체 하나 가져오기
+                        var user = db.Users.FirstOrDefault(u => u.UserId.Equals(model.UserId) && u.UserPw.Equals(model.UserPw));
+
+                        if (user != null) // 유저가 존재하면
+                        {
+                            HttpContext.Session.SetInt32("USER_LOGIN_KEY", user.UserNo); // 세션에 유저 로그인키로 가져온 유저의 No 저장
+                            return RedirectToAction("LoginSuccess", "Home"); // 로그인 성공 화면 출력
+                        }
                     }
                 }
-                ModelState.AddModelError(string.Empty, "사용자 ID 혹은 비밀번호가 올바르지 않습니다.");
             }
+            ModelState.AddModelError(string.Empty, "사용자 ID 혹은 비밀번호가 올바르지 않습니다."); // ID 또는 비밀번호가 일치하지 않을때
             return View(model);
         }
 
@@ -94,16 +115,17 @@ namespace TestWebSIte.Controllers
             {
                 using (var db = new BoardDbContext())
                 {
-                    var user = db.Users.FirstOrDefault(u => u.UserEmail.Equals(model.UserEmail));
+                    var user = db.Users.FirstOrDefault(u => u.UserEmail.Equals(model.UserEmail)); // 사용자가 입력한 Email과 DB에 해당하는 유저중 Email이 같은 유저객체 하나 가져오기
 
                     if (user != null)
                     {
+                        // DB에서 가져온 유저객체의 ID를 가져와서 
                         var id = user.UserId.ToString();
-                        ViewBag.id = id;
+                        ViewBag.id = id; // ViewBag에다가 id값을 넣는다
                         return View();
                     }
                 }
-                ModelState.AddModelError(string.Empty, "입력하신 Email에 일치하는 ID가 없습니다.");
+                ModelState.AddModelError(string.Empty, "입력하신 Email에 일치하는 ID가 없습니다."); // 사용자가 입력한 Email에 해당하는 유저가 없을시 Error 문구 노출
             }
             return View(model);
         }
@@ -122,16 +144,17 @@ namespace TestWebSIte.Controllers
             {
                 using (var db = new BoardDbContext())
                 {
+                    // 사용자가 입력한 ID && 사용자가 입력한 비밀번호 해시값과 DB에 담긴 ID와 해시값이 각각 같은 유저 객체 하나 가져오기
                     var user = db.Users.FirstOrDefault(u => u.UserId.Equals(model.UserId) && u.UserEmail.Equals(model.UserEmail));
-
                     if (user != null)
                     {
+                        // 해당하는 유저의 비밀번호 가져오기
                         var pw = user.UserPw.ToString();
-                        ViewBag.pw = pw;
+                        ViewBag.pw = pw; // ViewBag에 가져온 비밀번호 담기
                         return View();
                     }
                 }
-                ModelState.AddModelError(string.Empty, "입력하신 ID 또는 Email에 일치하는 비밀번호가 없습니다.");
+                ModelState.AddModelError(string.Empty, "입력하신 ID 또는 Email에 일치하는 비밀번호가 없습니다."); // 사용자가 입력한 ID 또는 Email에 해당하는 유저가 없을시 Error 문구 노출
             }
             return View(model);
         }
@@ -139,8 +162,10 @@ namespace TestWebSIte.Controllers
         // 사용자 본인 or 관리자 : 정보 수정 View
         public IActionResult ChangeInfo()
         {
+            // 로그인 안되어있을시
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
             {
+                // 로그인 페이지로 이동
                 return RedirectToAction("Login", "Account");
             }
             // 현재 로그인된 User의 UserNo 가져오기
@@ -171,14 +196,33 @@ namespace TestWebSIte.Controllers
                 return RedirectToAction("Login", "Account");
             }
             var id = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
+
             if (id != user.UserNo)
             {
                 return NotFound();
             }
 
+            var pw = Request.Form["UserPw"].ToString();
+            
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: pw,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8
+                ));
+
+            user.UserPw = hashed;
+            user.UserSalt = salt;
+
             if (ModelState.IsValid)
             {
-
                 using (var db = new BoardDbContext())
                 {
                     db.Update(user);
@@ -218,8 +262,17 @@ namespace TestWebSIte.Controllers
                 using (var db = new BoardDbContext())
                 {
                     var user = db.Users.Find(id);
-                    var pw = user.UserPw;
-                    if (pw.Equals(model.UserPw))
+                    var pw = user.UserPw; // DB에 저장되어있는 Password
+
+                    string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: model.UserPw, // 사용자가 입력한 Password
+                        salt: user.UserSalt,
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 10000,
+                        numBytesRequested: 256 / 8
+                        ));
+
+                    if (pw.Equals(hashed))
                     {
                         return RedirectToAction("ChangeInfo", "Account");
                     }
@@ -241,30 +294,49 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult SignUp(User model)
         {
+
             ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
+            var pw = Request.Form["UserPw"].ToString();
 
             model.SignUpYear = DateTime.Now.ToString("yyyy");
             model.SignUpMonth = DateTime.Now.ToString("MM");
             model.SignUpDay = DateTime.Now.ToString("MM'/'dd'/'yyyy");
 
-            if (ModelState.IsValid)
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
             {
-                if (!ReCaptchaPassed(
-                    Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
-                    _configuration.GetSection("GoogleReCaptcha:secret").Value,
-                    _logger
-                    ))
-                {
-                    ModelState.AddModelError(string.Empty, "넌 틀렸어. 이 멍청한 로봇아! Go play some 1x1 on SFs instead.");
-                    return View(model);
-                }
-                using (var db = new BoardDbContext())
-                {
-                    db.Users.Add(model);
-                    db.SaveChanges();
-                }
-                return RedirectToAction("Index", "Home");
+                rng.GetBytes(salt);
             }
+
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: pw,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8
+                ));
+
+            model.UserPw = hashed;
+            model.UserSalt = salt;
+
+            if (ModelState.IsValid)
+                {
+                    if (!ReCaptchaPassed(
+                        Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
+                        _configuration.GetSection("GoogleReCaptcha:secret").Value,
+                        _logger
+                        ))
+                    {
+                        ModelState.AddModelError(string.Empty, "넌 틀렸어. 이 멍청한 로봇아! Go play some 1x1 on SFs instead.");
+                        return View(model);
+                    }
+                    using (var db = new BoardDbContext())
+                    {
+                        db.Users.Add(model);
+                        db.SaveChanges();
+                    }
+                    return RedirectToAction("Index", "Home");
+                }
 
             return View(model);
         }

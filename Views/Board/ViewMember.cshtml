@@ -5,6 +5,13 @@
 
 <h2>관리자용 고객 목록</h2>
 
+
+<form asp-controller="Board" asp-action="ViewMember" method="post">
+    <div class="form-group float-right">
+        <input type="text" placeholder="유저 검색" name="SearchUser"/>
+        <button type="submit" value="Search" id="reg_submit" class="btn btn-primary">검색</button>
+    </div>
+</form>
 <table class="table table-bordered">
     <thead>
         <tr>

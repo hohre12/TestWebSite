@@ -1240,6 +1240,31 @@ namespace TestWebSIte.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ViewMember(int? Page , int zz)
+        {
+            var SearchUser = Request.Form["SearchUser"].ToString();
+
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
+            using (var db = new BoardDbContext())
+            {
+                var User = from u in db.Users
+                              where u.UserId.Contains(SearchUser)
+                              select u;
+
+                var list = await User.ToListAsync();
+                var PageNo = Page ?? 1;
+                var PageSize = 5;
+
+                return View(list.ToPagedList(PageNo, PageSize));
+            }
+        }
+
         /// <summary>
         /// 관리자 : 회원 정보 상세보기 VIew
         /// </summary>

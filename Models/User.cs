@@ -29,6 +29,7 @@ namespace TestWebSIte.Models
         public string SignUpDay { get; set; }
         public string SignUpMonth { get; set; }
         public string SignUpYear { get; set; }
+        public byte[] UserSalt { get; set; }
 
     }
 }
