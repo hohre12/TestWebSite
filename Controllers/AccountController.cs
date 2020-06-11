@@ -191,25 +191,33 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult ChangeInfo(User user)
         {
+            // 현재 로그인 상태가 아니면
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
             {
+                // 로그인 페이지로 이동
                 return RedirectToAction("Login", "Account");
             }
+            // 현재 접속중인 유저의 No를 가져와서
             var id = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
 
+            // 가져온 유저의 No와 일치하는 유저가 없으면
             if (id != user.UserNo)
             {
                 return NotFound();
             }
 
+            // 사용자가 입력한 패스워드 가져오기
             var pw = Request.Form["UserPw"].ToString();
-            
+
+            // 16바이트 랜덤 바이트 값 가져오기 ( 솔트 )
             byte[] salt = new byte[128 / 8];
             using (var rng = RandomNumberGenerator.Create())
             {
+                // 랜덤함수 돌리고
                 rng.GetBytes(salt);
             }
 
+            // 해시값 생성 ( 사용자가 입력한 패스워드 , 16바이트 랜덤 바이트 (솔트 값) , 암호화 형식 (SHA1) , 해시할 횟수 , 생성될 바이트 길이 ( 32 바이트 )
             string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: pw,
                 salt: salt,
@@ -218,16 +226,19 @@ namespace TestWebSIte.Controllers
                 numBytesRequested: 256 / 8
                 ));
 
-            user.UserPw = hashed;
-            user.UserSalt = salt;
+            user.UserPw = hashed; // 생성된 해시값을 DB에 넣을 유저 패스워드에 값을 넣고
+            user.UserSalt = salt; // 새로 생성된 솔트값을 DB에 넣을 유저 솔트에 값을 넣고
 
             if (ModelState.IsValid)
             {
                 using (var db = new BoardDbContext())
                 {
+                    // DB 업데이트
                     db.Update(user);
+                    // DB 저장 and 체인지
                     db.SaveChanges();
                 }
+                // 성공하면 정보 변경 성공 화면으로 이동
                 return RedirectToAction("ChangeMyInforSuccess", "Home");
             }
             return View(user);
@@ -251,6 +262,7 @@ namespace TestWebSIte.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+            // 현재 로그인 중인 유저의 No값 가져오기
             var id = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
             if (id == 0)
             {
@@ -261,6 +273,7 @@ namespace TestWebSIte.Controllers
             {
                 using (var db = new BoardDbContext())
                 {
+                    // 가져온 유저의 No값으로 DB에서 해당하는 유저 객체를 가져온다
                     var user = db.Users.Find(id);
                     var pw = user.UserPw; // DB에 저장되어있는 Password
 
@@ -272,6 +285,7 @@ namespace TestWebSIte.Controllers
                         numBytesRequested: 256 / 8
                         ));
 
+                    // 생성된 해시값이랑 DB에 저장되어있는 해시값이 같으면  
                     if (pw.Equals(hashed))
                     {
                         return RedirectToAction("ChangeInfo", "Account");
@@ -294,10 +308,12 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult SignUp(User model)
         {
-
+            // View단에 사용될 리캡챠 키값
             ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
+            // 사용자가 입력한 패스워드값(해시 전)
             var pw = Request.Form["UserPw"].ToString();
 
+            // DB에 저장될 회원가입 당시의 날짜 , 월 , 년
             model.SignUpYear = DateTime.Now.ToString("yyyy");
             model.SignUpMonth = DateTime.Now.ToString("MM");
             model.SignUpDay = DateTime.Now.ToString("MM'/'dd'/'yyyy");
@@ -320,23 +336,25 @@ namespace TestWebSIte.Controllers
             model.UserSalt = salt;
 
             if (ModelState.IsValid)
+            {
+                // 리캡챠 패스가 안됫을 경우 -> 리캡챠 통과 안됫을 경우
+                if (!ReCaptchaPassed(
+                    Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
+                    _configuration.GetSection("GoogleReCaptcha:secret").Value,
+                    _logger
+                    ))
                 {
-                    if (!ReCaptchaPassed(
-                        Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
-                        _configuration.GetSection("GoogleReCaptcha:secret").Value,
-                        _logger
-                        ))
-                    {
-                        ModelState.AddModelError(string.Empty, "넌 틀렸어. 이 멍청한 로봇아! Go play some 1x1 on SFs instead.");
-                        return View(model);
-                    }
-                    using (var db = new BoardDbContext())
-                    {
-                        db.Users.Add(model);
-                        db.SaveChanges();
-                    }
-                    return RedirectToAction("Index", "Home");
+                    ModelState.AddModelError(string.Empty, "넌 틀렸어. 이 멍청한 로봇아! Go play some 1x1 on SFs instead."); // 에러 문구 노출
+                    return View(model);
                 }
+                // 리캡챠 패스됫을 경우
+                using (var db = new BoardDbContext())
+                {
+                    db.Users.Add(model); // DB에 생성한 유저 객체 Add
+                    db.SaveChanges(); // DB 저장 and 체인지
+                }
+                return RedirectToAction("Index", "Home"); // 회원가입 성공시 Home/Index/
+            }
 
             return View(model);
         }
@@ -344,23 +362,25 @@ namespace TestWebSIte.Controllers
         // @@@ 아이디 중복체크 - 구현완료 - ajax로 구현함! @@@
         public int IdChkForm()
         {
+            // ajax로 get방식의 url에 있는 userId 값 가져오기
             var userId = Request.Query["UserId"];
             using (var db = new BoardDbContext())
             {
-                var user = db.Users.ToList();
+                var user = db.Users.ToList(); // DB에 있는 모든 유저객체 가져오기
+                // 가져온 유저객체들 에서 Linq쿼리 실행 
                 var user_id = from u in user
                               select u;
-                user_id = user_id.Where(u => u.UserId == userId);
+                user_id = user_id.Where(u => u.UserId == userId); // 실행한 Linq쿼리에서 where 조건절 추가해서 ajax로 가져온 userId값과 가져온 유저객체들 중 ID가 일치하는 유저 객체 가져오기
                 if (userId.Equals(""))
                 {
-                    return 2;
+                    return 2; // input text id창에 사용자가 입력한 값이 공백이면 return 2
                 }
                 else if (user_id.Count() != 0)
                 {
-                    return 1;
+                    return 1; // where 조건절 실행후 일치하는 유저가 1명 이상이면 return 1 -> 즉, ID중복이면.
                 }
             }
-            return 0;
+            return 0; // 이외에 모든 경우엔 return 0 -> 아이디 중복이 아닌경우
         }
 
 
@@ -371,15 +391,17 @@ namespace TestWebSIte.Controllers
         /// <returns></returns>
         public IActionResult Detail()
         {
+            // 로그인 안되어있으면 Login 페이지로 이동
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
             {
                 return RedirectToAction("Login", "Account");
             }
-
+            // 현재 로그인 되어있는 유저의 No를 세션에서 가져와서
             var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
 
             using (var db = new BoardDbContext())
             {
+                // 세션에서 가져온 userNo와 DB에 있는 유저객체들의 userNo를 비교하여 일치하는 유저객체 하나를 가져온다.
                 var user = db.Users.FirstOrDefault(u => u.UserNo.Equals(userNo));
                 return View(user);
             }
