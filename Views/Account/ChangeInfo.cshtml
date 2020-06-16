@@ -3,11 +3,15 @@
 <html>
 <head>
     <script type="text/javascript">
-        $(document).ready(function () {
-            $('#ChangePw').click(function () {
-                alert('hello');
-                $('#UserPw').attr('readonly', true);
-            });
+        function changePw_click() {
+            if (UserPw.readOnly == true) {
+                document.all.UserPw.readOnly = false;
+                document.all.UserPw.value = '';
+                document.all.ChangePw.disabled = true;
+            }
+            else if (UserPw.readOnly == false) {
+                document.all.UserPw.readOnly = true;
+            }
         }
     </script>
 </head>
@@ -22,6 +26,7 @@
                 <input type="hidden" asp-for="SignUpDay" />
                 <input type="hidden" asp-for="SignUpMonth" />
                 <input type="hidden" asp-for="SignUpYear" />
+                <input type="hidden" asp-for="UserSalt" />
                 <div class="form-group">
                     <label asp-for="UserId" class="control-label">ID</label>
                     <input type="text" asp-for="UserId" class="form-control" readonly />
@@ -29,7 +34,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="UserPw" class="control-label">비밀번호</label>
-                    <input type="password" name="UserPw" value=@Model.UserPw class="form-control" />
+                    <input type="password" name="UserPw" id="UserPw" value=@Model.UserPw readonly="readonly" class="form-control" />
                     <span asp-validation-for="UserPw" class="text-danger"></span>
                 </div>
                 <div class="form-group">
@@ -49,7 +54,7 @@
                 </div>
 
                 <div class="form-group">
-                    <!--input type="button" id="ChangePw" value="비밀번호 변경" class="btn btn-primary" /-->
+                    <input type="button" id="ChangePw" onclick="changePw_click();" value="비밀번호 변경" class="btn btn-primary" />
                     <input type="submit" value="저으장" class="btn btn-primary" />
                 </div>
             </form>

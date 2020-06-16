@@ -190,6 +190,7 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult ChangeInfo(User user)
         {
+            var db2 = new BoardDbContext();
             // 현재 로그인 상태가 아니면
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
             {
@@ -197,36 +198,45 @@ namespace TestWebSIte.Controllers
                 return RedirectToAction("Login", "Account");
             }
             // 현재 접속중인 유저의 No를 가져와서
-            var id = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
+            var no = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
+            var user2 = db2.Users.FirstOrDefault(u => u.UserNo.Equals(no));
 
             // 가져온 유저의 No와 일치하는 유저가 없으면
-            if (id != user.UserNo)
+            if (no != user.UserNo)
             {
                 return NotFound();
             }
 
             // 사용자가 입력한 패스워드 가져오기
             var pw = Request.Form["UserPw"].ToString();
-
-            // 16바이트 랜덤 바이트 값 가져오기 ( 솔트 )
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
+            
+            if(pw != user2.UserPw) // 사용자가 입력한 비밀번호가 기존의 비밀번호와 다를경우 -> 즉 비밀번호를 변경했을때
             {
-                // 랜덤함수 돌리고
-                rng.GetBytes(salt);
+                // 16바이트 랜덤 바이트 값 가져오기 ( 솔트 )
+                byte[] salt = new byte[128 / 8];
+                using (var rng = RandomNumberGenerator.Create())
+                {
+                    // 랜덤함수 돌리고
+                    rng.GetBytes(salt);
+                }
+
+                // 해시값 생성 ( 사용자가 입력한 패스워드 , 16바이트 랜덤 바이트 (솔트 값) , 암호화 형식 (SHA1) , 해시할 횟수 , 생성될 바이트 길이 ( 32 바이트 )
+                string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    password: pw,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA1,
+                    iterationCount: 10000,
+                    numBytesRequested: 256 / 8
+                    ));
+
+                user.UserPw = hashed; // 생성된 해시값을 DB에 넣을 유저 패스워드에 값을 넣고
+                user.UserSalt = salt; // 새로 생성된 솔트값을 DB에 넣을 유저 솔트에 값을 넣고
             }
-
-            // 해시값 생성 ( 사용자가 입력한 패스워드 , 16바이트 랜덤 바이트 (솔트 값) , 암호화 형식 (SHA1) , 해시할 횟수 , 생성될 바이트 길이 ( 32 바이트 )
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: pw,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA1,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8
-                ));
-
-            user.UserPw = hashed; // 생성된 해시값을 DB에 넣을 유저 패스워드에 값을 넣고
-            user.UserSalt = salt; // 새로 생성된 솔트값을 DB에 넣을 유저 솔트에 값을 넣고
+            else if(pw == user2.UserPw) // 사용자가 입력한 비밀번호가 기존의 비밀번호와 같을경우 -> 즉 비밀번호는 변경하지않고 다른 정보만 변경했을때
+            {
+                user.UserPw = pw;
+            }
+            
 
             if (ModelState.IsValid)
             {
