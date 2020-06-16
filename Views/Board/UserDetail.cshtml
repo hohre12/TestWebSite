@@ -32,7 +32,7 @@
 </div>
 
 <div class="form-group text-center">
-    <!--<a class="btn btn-secondary" asp-controller="Board" asp-action="UserEdit" asp-route-boardNo="@Model.UserNo">수정</a>-->
+    <a class="btn btn-secondary" asp-controller="Board" asp-action="UserEdit" asp-route-userNo="@Model.UserNo">수정</a>
     <a class="btn btn-secondary" onclick="return confirm('데이터에서 완전히 삭제됩니다. 정말 삭제하시겠습니까?')" asp-controller="Board" asp-action="UserDelete" asp-route-userNo="@Model.UserNo">삭제</a>
     <a class="btn btn-secondary" asp-controller="Board" asp-action="ViewMember">뒤로가기</a>
 </div>

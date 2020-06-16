@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using TestWebSIte.ViewModel;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -27,9 +29,10 @@ namespace TestWebSIte.Controllers
         {
             using (var db = new BoardDbContext())
             {
+                // DB에 있는 모든 보드 리스트 가져오기
                 var list = db.Boards.ToList();
-                var PageNo = Page ?? 1;
-                var PageSize = 5;
+                var PageNo = Page ?? 1; // 페이징
+                var PageSize = 5; // 한페이지당 5개의 보드
 
                 return View(list.ToPagedList(PageNo, PageSize));
             }
@@ -53,21 +56,27 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult Add(Board model)
         {
+            // 로그인이 안되어있다면 로그인 페이지로 이동
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
             {
                 return RedirectToAction("Login", "Account");
             }
+            // 현재 로그인 되어있는 유저의 No 가져오기
             model.UserNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
 
             if (ModelState.IsValid)
             {
-                model.Regdate = DateTime.Now.ToString("yyyy-MM-dd");
-                model.Modidate = DateTime.Now.ToString("yyyy-MM-dd");
+                // DB에 저장될 Board 데이터 입력
+                model.Regdate = DateTime.Now.ToString("yyyy-MM-dd"); // 생성 날짜
+                model.Modidate = DateTime.Now.ToString("yyyy-MM-dd"); // 마지막으로 수정 날짜 ( 나중에 Modify에서 또 지정하기때문에 변경됨 )
                 using (var db = new BoardDbContext())
                 {
+                    // Board DB에 입력한 보드 모델객체 데이터 저장
                     db.Boards.Add(model);
+                    // DB 저장 and 체인지 후 그 값이 0 이상 이면 , 즉 처리가 됫으면
                     if (db.SaveChanges() > 0)
                     {
+                        // Board -> Index 페이지로 이동
                         return Redirect("Index");
                     }
                 }
@@ -83,9 +92,9 @@ namespace TestWebSIte.Controllers
         /// <returns></returns>
         public IActionResult Detail(int boardNo)
         {
-
             using (var db = new BoardDbContext())
             {
+                // 사용자가 선택한 게시물의 boardNo를 파라미터로 받아와서 db에 저장되어있는 게시물의 boardNo와 비교한뒤 일치하는 게시물을 하나 가져온다.
                 var board = db.Boards.FirstOrDefault(b => b.BoardNo.Equals(boardNo));
                 return View(board);
             }
@@ -101,6 +110,7 @@ namespace TestWebSIte.Controllers
 
             using (var db = new BoardDbContext())
             {
+                // 사용자가 선택한 게시물의 boardNo를 파라미터로 받아와서 db에 저장되어있는 게시물의 boardNo와 비교한뒤 일치하는 게시물을 하나 가져온다.
                 var board = db.Boards.FirstOrDefault(b => b.BoardNo.Equals(boardNo));
                 return View(board);
             }
@@ -120,12 +130,14 @@ namespace TestWebSIte.Controllers
             //}
             if (ModelState.IsValid)
             {
+                // 수정할때에 수정날짜 현재시간으로
                 model.Modidate = DateTime.Now.ToString("yyyy-MM-dd");
 
                 using (var db = new BoardDbContext())
                 {
+                    // 수정한 board DB에 업데이트
                     var board = db.Boards.Update(model);
-                    db.SaveChanges();
+                    db.SaveChanges(); // 저장 and Change
 
                     return Redirect("Index");
                 }
@@ -148,8 +160,10 @@ namespace TestWebSIte.Controllers
 
             using (var db = new BoardDbContext())
             {
+                // 사용자가 선택한 게시물의 boardNo를 파라미터로 받아와서 db에 저장되어있는 게시물의 boardNo와 비교한뒤 일치하는 게시물을 하나 가져온다.
                 var board = db.Boards.FirstOrDefault(b => b.BoardNo.Equals(boardNo));
-                db.Boards.Remove(board);
+                db.Boards.Remove(board); // 가져온 Board 객체를 Board Table에서 삭제한다.
+                // 즉 완전 삭제 -> 복구 불가 -> * Delete 여부를 0,1로 구분해서 본인이 삭제햇을때는 1로 남고 관리자가 삭제햇을때는 0으로 남게 해도 좋을듯
                 db.SaveChanges();
             }
             return Redirect("Index");
@@ -160,6 +174,7 @@ namespace TestWebSIte.Controllers
         {
             using (var db = new BoardDbContext())
             {
+                // Board Table에 있는 모든 리스트 다 가져오기.
                 var list = db.Boards.ToList();
                 var PageNo = Page ?? 1;
                 var PageSize = 5;
@@ -177,6 +192,7 @@ namespace TestWebSIte.Controllers
             }
             using (var db = new BoardDbContext())
             {
+                // 사용자가 선택한 게시물의 boardNo를 파라미터로 받아와서 db에 저장되어있는 게시물의 boardNo와 비교한뒤 일치하는 게시물을 하나 가져온다.
                 var board = db.Boards.FirstOrDefault(b => b.BoardNo.Equals(boardNo));
                 return View(board);
             }
@@ -186,16 +202,18 @@ namespace TestWebSIte.Controllers
         [HttpPost]
         public IActionResult Order(Order model, int boardNo)
         {
+            // 세션에 저장되어있는 현재 로그인된 유저의 No 가져오기
             var userNo = int.Parse(HttpContext.Session.GetInt32("USER_LOGIN_KEY").ToString());
-            model.OrderDay = DateTime.Now.ToString("MM'/'dd'/'yyyy");
-            model.OrderMonth = DateTime.Now.ToString("MM");
-            model.OrderYear = DateTime.Now.ToString("yyyy");
+            model.OrderDay = DateTime.Now.ToString("MM'/'dd'/'yyyy"); // 주문하는 당시 월 / 일 / 년도
+            model.OrderMonth = DateTime.Now.ToString("MM"); // 주문하는 당시 월
+            model.OrderYear = DateTime.Now.ToString("yyyy"); // 주문하는 당시 년도
             if (ModelState.IsValid)
             {
                 using (var db = new BoardDbContext())
                 {
+                    // 사용자가 선택한 게시물의 boardNo를 파라미터로 받아와서 db에 저장되어있는 게시물의 boardNo와 비교한뒤 일치하는 게시물을 하나 가져온다.
                     var list = db.Boards.FirstOrDefault(b => b.BoardNo.Equals(boardNo));
-                    model.BoardContent = list.BoardContent;
+                    model.BoardContent = list.BoardContent; // 
                     model.UserNo = userNo;
                     db.Orders.Add(model);
                     db.SaveChanges();
@@ -219,7 +237,7 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // 관리자 : 미승인 주문내역에서 승인처리 기능 실행
+        // 관리자 : 미승인 주문내역에서 승인처리 기능 실행 -> user No로 구분하여 user Name 가져와야겠다~
         [HttpPost]
         public IActionResult OrderList(int orderNo, ApprovedOrder model)
         {
@@ -256,11 +274,12 @@ namespace TestWebSIte.Controllers
             }
         }
 
-        // 관리자 : 승인된 리스트 View
+        // 관리자 : 승인된 리스트 View -> ApprovalOrder.cshtml에서 승인번호랑 주문자번호는 빼고, 주문자 이름, 주문 시간만 추가하면 될듯
         public IActionResult ApprovalOrder(int? Page)
         {
             using (var db = new BoardDbContext())
             {
+                // 
                 var list = db.ApprovedOrders.ToList();
                 var PageNo = Page ?? 1;
                 var PageSize = 5;
@@ -278,6 +297,7 @@ namespace TestWebSIte.Controllers
         {
             using (var db = new BoardDbContext())
             {
+
                 IQueryable<string> titleQuery = from p in db.Boards
                                                 orderby p.BoardTitle
                                                 select p.BoardTitle;
@@ -469,6 +489,10 @@ namespace TestWebSIte.Controllers
         public IActionResult Notice(Notice model)
         {
             if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") != 1) // 관리자 이외에 접근 불가
             {
                 return RedirectToAction("Login", "Account");
             }
@@ -1298,6 +1322,73 @@ namespace TestWebSIte.Controllers
                 db.SaveChanges();
             }
             return Redirect("Index");
+        }
+
+        public IActionResult UserEdit(int userNo)
+        {
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            using (var db = new BoardDbContext())
+            {
+                var user = db.Users.FirstOrDefault(b => b.UserNo.Equals(userNo));
+                if(user != null)
+                {
+                    ViewBag.userId = user.UserId;
+                    return View(user);
+                }
+            }
+            return RedirectToAction("Index","Home");
+        }
+
+        [HttpPost]
+        public IActionResult UserEdit(User user)
+        {
+            // 현재 로그인 상태가 아니면
+            if (HttpContext.Session.GetInt32("USER_LOGIN_KEY") == null)
+            {
+                // 로그인 페이지로 이동
+                return RedirectToAction("Login", "Account");
+            }
+
+            // 사용자가 입력한 패스워드 가져오기
+            var pw = Request.Form["UserPw"].ToString();
+
+            // 16바이트 랜덤 바이트 값 가져오기 ( 솔트 )
+            byte[] salt = new byte[128 / 8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                // 랜덤함수 돌리고
+                rng.GetBytes(salt);
+            }
+
+            // 해시값 생성 ( 사용자가 입력한 패스워드 , 16바이트 랜덤 바이트 (솔트 값) , 암호화 형식 (SHA1) , 해시할 횟수 , 생성될 바이트 길이 ( 32 바이트 )
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: pw,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA1,
+                iterationCount: 10000,
+                numBytesRequested: 256 / 8
+                ));
+
+            user.UserPw = hashed; // 생성된 해시값을 DB에 넣을 유저 패스워드에 값을 넣고
+            user.UserSalt = salt; // 새로 생성된 솔트값을 DB에 넣을 유저 솔트에 값을 넣고
+
+            if (ModelState.IsValid)
+            {
+                using (var db = new BoardDbContext())
+                {
+                    // DB 업데이트
+                    db.Update(user);
+                    // DB 저장 and 체인지
+                    db.SaveChanges();
+                }
+                // 성공하면 정보 변경 성공 화면으로 이동
+                return RedirectToAction("ChangeMyInforSuccess", "Home");
+            }
+            return View(user);
         }
 
 

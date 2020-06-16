@@ -45,7 +45,6 @@ namespace TestWebSIte.Controllers
                 HttpContext.Session.Remove("USER_LOGIN_KEY");
             }
 
-
             return View();
         }
 
