@@ -20,6 +20,7 @@ namespace TestWebSIte.Models
         //[DisplayName(User.UserName)]
         public int UserNo { get; set; }
 
+
         public string Regdate { get; set; }
 
         public string Modidate { get; set; }
@@ -28,5 +29,8 @@ namespace TestWebSIte.Models
 
         [ForeignKey("UserNo")]
         public virtual User User { get; set; }
+
+        public string UserName { get; set; }
+        
     }
 }

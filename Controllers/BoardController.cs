@@ -71,6 +71,8 @@ namespace TestWebSIte.Controllers
                 model.Modidate = DateTime.Now.ToString("yyyy-MM-dd"); // 마지막으로 수정 날짜 ( 나중에 Modify에서 또 지정하기때문에 변경됨 )
                 using (var db = new BoardDbContext())
                 {
+                    var user = db.Users.FirstOrDefault(b => b.UserNo.Equals(model.UserNo));
+                    model.UserName = user.UserName;
                     // Board DB에 입력한 보드 모델객체 데이터 저장
                     db.Boards.Add(model);
                     // DB 저장 and 체인지 후 그 값이 0 이상 이면 , 즉 처리가 됫으면
