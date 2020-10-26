@@ -68,6 +68,9 @@
                                 <a class="nav-link text-dark" asp-controller="Board" asp-action="Statistics">통계</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Board" asp-action="ViewMember">관리자용 회원정보보기</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" onclick="return confirm('로그아웃 하시겠습니까?')" asp-controller="Account" asp-action="Logout">로그아웃</a>
                             </li>
                         }
@@ -106,7 +109,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2020 - HostCenter - <a asp-controller="Home" asp-action="Index">Home</a>
+            &copy; 2020 - BaeJaeWon - <a asp-controller="Home" asp-action="Index">Home</a>
         </div>
     </footer>
 

@@ -28,7 +28,7 @@ namespace TestWebSIte
 
             // services.AddSingleton<IActionContextAccessor,ActionContextAccessor>(); // 페이징 처리인데...안되네;
 
-            // 의존성 주입
+            // 의존성 주입 -> 여기서 세션 타임아웃 설정 가능
             services.AddSession();
 
             // @@@ 배포 추가

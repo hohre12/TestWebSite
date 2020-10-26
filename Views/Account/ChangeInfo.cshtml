@@ -1,43 +1,64 @@
 ﻿@model TestWebSIte.Models.User
-<script>
 
-</script>
-<h1>내정보 수정</h1>
+<html>
+<head>
+    <script type="text/javascript">
+        function changePw_click() {
+            if (UserPw.readOnly == true) {
+                document.all.UserPw.readOnly = false;
+                document.all.UserPw.value = '';
+                document.all.ChangePw.disabled = true;
+            }
+            else if (UserPw.readOnly == false) {
+                document.all.UserPw.readOnly = true;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>내정보 수정</h1>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-controller="Account" asp-action="ChangeInfo" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="UserNo" />
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label">ID</label>
-                <input type="text" asp-for="UserId" class="form-control" readonly/>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserPw" class="control-label">비밀번호</label>
-                <input type="password" asp-for="UserPw" class="form-control" />
-                <span asp-validation-for="UserPw" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserName" class="control-label">이름</label>
-                <input asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserEmail" class="control-label">이메일</label>
-                <input asp-for="UserEmail" class="form-control" />
-                <span asp-validation-for="UserEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserIntro" class="control-label">소개</label>
-                <input asp-for="UserIntro" class="form-control" />
-                <span asp-validation-for="UserIntro" class="text-danger"></span>
-            </div>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-controller="Account" asp-action="ChangeInfo" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="UserNo" />
+                <input type="hidden" asp-for="SignUpDay" />
+                <input type="hidden" asp-for="SignUpMonth" />
+                <input type="hidden" asp-for="SignUpYear" />
+                <input type="hidden" asp-for="UserSalt" />
+                <div class="form-group">
+                    <label asp-for="UserId" class="control-label">ID</label>
+                    <input type="text" asp-for="UserId" class="form-control" readonly />
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserPw" class="control-label">비밀번호</label>
+                    <input type="password" name="UserPw" id="UserPw" value=@Model.UserPw readonly="readonly" class="form-control" />
+                    <span asp-validation-for="UserPw" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserName" class="control-label">이름</label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserEmail" class="control-label">이메일</label>
+                    <input asp-for="UserEmail" class="form-control" />
+                    <span asp-validation-for="UserEmail" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="UserIntro" class="control-label">소개</label>
+                    <input asp-for="UserIntro" class="form-control" />
+                    <span asp-validation-for="UserIntro" class="text-danger"></span>
+                </div>
 
-            <div class="form-group">
-                <input type="submit" value="저으장" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group">
+                    <input type="button" id="ChangePw" onclick="changePw_click();" value="비밀번호 변경" class="btn btn-primary" />
+                    <input type="submit" value="저으장" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</body>
+</html>

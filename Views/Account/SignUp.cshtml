@@ -1,90 +1,124 @@
 ﻿@model TestWebSIte.Models.User
 
-<script language="javascript" type="text/javascript"></script>
-@{
-    ViewData["Title"] = "회원가입";
-}
-<h2>회원가입</h2>
+<html>
+<head>
+    <script type="text/javascript">
+        function password_check() {
+            var pwd1 = document.getElementById("user_pw").value;
+            var pwd2 = document.getElementById("pw_chk").value;
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-controller="Account" asp-action="SignUp" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label>사용자 ID</label>
-                <input type="text" asp-for="UserId" id="user_id" class="form-control" placeholder="사용자 ID 입력" />
-                <div class="text-danger" id="id_check"></div>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label>사용자 비밀번호</label>
-                <input type="password" asp-for="UserPw" class="form-control" placeholder="사용자 비밀번호 입력" />
-                <span asp-validation-for="UserPw" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label>사용자 이름</label>
-                <input type="text" asp-for="UserName" class="form-control" placeholder="사용자 이름 입력" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>사용자 E-Mail</label>
-                <input type="text" asp-for="UserEmail" class="form-control" placeholder="사용자 소개 입력" />
-                <span asp-validation-for="UserEmail" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>사용자 소개</label>
-                <!--input type="text" asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" /-->
-                <textarea asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" rows="10"></textarea>
-                <span asp-validation-for="UserIntro" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label>인증</label>
-                <div class="g-recaptcha" data-sitekey="@ViewData["ReCaptchaKey"]"></div>
-            </div>
-
-            <div class="form-group">
-                <button type="submit" value="SignUp" id="reg_submit" class="btn btn-primary">회원가입</button>
-                <a class="btn btn-warning" href="../Home/Index">취소</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-controller="Home" asp-action="Index">Back to List</a>
-</div>
-<script type="text/javascript">
-    $("#user_id").blur(function () {
-        var user_id = $('#user_id').val();
-        $.ajax({
-            type: "get",
-            url: '/Account/IdChkForm?UserId=' + user_id,
-            success: function (data) {
-                console.log("1 = 중복o / 0 = 중복x : " + data);
-
-                if (data == 2) {
-                    $("#id_check").text("아이디를 입력하세요");
-                    $("#id_check").css("color", "red");
-                    $("#reg_submit").attr("disabled", false);
-                }
-                else if (data == 1) {
-                    $("#id_check").text("사용중인 아이디입니다.");
-                    $("#id_check").css("color", "red");
-                    $("#reg_submit").attr("disabled", true);
-                }
-                else {
-                    $("#id_check").text("가입 가능한 아이디입니다.");
-                    $("#id_check").css("color", "red");
-                    $("#reg_submit").attr("disabled", false);
-                }
+            if (pwd2 == "") {
+                document.getElementById("pw_check").innerHTML = '';
+                document.all.reg_submit.disabled = true;
             }
-        });
-    })
-</script>
+            else if (pwd1 != pwd2) {
+                document.getElementById("pw_check").innerHTML = '비밀번호가 일치하지 않습니다.';
+                document.all.reg_submit.disabled = true;
+            }
+            else if (pwd1 == pwd2) {
+                document.getElementById("pw_check").innerHTML = '비밀번호가 일치합니다.';
+                document.all.reg_submit.disabled = false;
+            }
+        }
+    </script>
+</head>
+<body>
 
-@section Scripts {
-    <script src='https://www.google.com/recaptcha/api.js'></script>
-}
+    @{
+        ViewData["Title"] = "회원가입";
+    }
+    <h2>회원가입</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-controller="Account" asp-action="SignUp" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label>사용자 ID</label>
+                    <input type="text" asp-for="UserId" id="user_id" class="form-control" placeholder="ID 입력" />
+                    <div class="text-danger" id="id_check"></div>
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>사용자 비밀번호</label>
+                    <input type="password" name="UserPw" id="user_pw" onkeyup="password_check()" class="form-control" placeholder="비밀번호 입력" />
+                    <span asp-validation-for="UserPw" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>사용자 비밀번호 재입력</label>
+                    <input type="password" id="pw_chk" onkeyup="password_check()" class="form-control" placeholder="비밀번호 재입력" />
+                    <span id="pw_check" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>사용자 이름</label>
+                    <input type="text" asp-for="UserName" class="form-control" placeholder="이름 입력" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>사용자 E-Mail</label>
+                    <input type="email" asp-for="UserEmail" class="form-control" placeholder="소개 입력" />
+                    <span asp-validation-for="UserEmail" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>사용자 소개</label>
+                    <!--input type="text" asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" /-->
+                    <textarea asp-for="UserIntro" class="form-control" placeholder="사용자 소개 입력" rows="10"></textarea>
+                    <span asp-validation-for="UserIntro" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>인증</label>
+                    <div class="g-recaptcha" data-sitekey="@ViewData["ReCaptchaKey"]"></div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" value="SignUp" id="reg_submit" class="btn btn-primary">회원가입</button>
+                    <a class="btn btn-warning" href="../Home/Index">취소</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-controller="Home" asp-action="Index">Back to List</a>
+    </div>
+
+    <script type="text/javascript">
+        $("#user_id").blur(function () {
+            var user_id = $('#user_id').val();
+            $.ajax({
+                type: "get",
+                url: '/Account/IdChkForm?UserId=' + user_id,
+                success: function (data) {
+                    console.log("1 = 중복o / 0 = 중복x : " + data);
+
+                    if (data == 2) {
+                        $("#id_check").text("아이디를 입력하세요");
+                        $("#id_check").css("color", "red");
+                        $("#reg_submit").attr("disabled", false);
+                    }
+                    else if (data == 1) {
+                        $("#id_check").text("사용중인 아이디입니다.");
+                        $("#id_check").css("color", "red");
+                        $("#reg_submit").attr("disabled", true);
+                    }
+                    else {
+                        $("#id_check").text("가입 가능한 아이디입니다.");
+                        $("#id_check").css("color", "red");
+                        $("#reg_submit").attr("disabled", false);
+                    }
+                }
+            });
+        })
+    </script>
+
+
+    @section Scripts {
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+    }
+</body>
+</html>
+
+

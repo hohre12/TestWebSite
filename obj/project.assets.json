@@ -8360,11 +8360,19 @@
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
       "projectUniqueName": "C:\\Github\\TestWebSite\\TestWebSIte.csproj",
       "projectName": "TestWebSIte",
       "projectPath": "C:\\Github\\TestWebSite\\TestWebSIte.csproj",
       "packagesPath": "C:\\Users\\JaeWon\\.nuget\\packages\\",
       "outputPath": "C:\\Github\\TestWebSite\\obj\\",
+=======
+      "projectUniqueName": "C:\\Github\\Master\\TestWebSIte.csproj",
+      "projectName": "TestWebSIte",
+      "projectPath": "C:\\Github\\Master\\TestWebSIte.csproj",
+      "packagesPath": "C:\\Users\\JaeWon\\.nuget\\packages\\",
+      "outputPath": "C:\\Github\\Master\\obj\\",
+>>>>>>> a90c43023ec6fa5ab366fb1a33ad849cc77c8ff9
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\JaeWon\\AppData\\Roaming\\NuGet\\NuGet.Config",
